@@ -1,0 +1,14 @@
+<form [formGroup]="myForm">
+    {{a}} + {{b}} = 
+    <input formControlName="answer" />
+</form>
+
+<div>
+    Form is Valid : {{myForm.valid}}
+</div>
+<div>
+    Form values : {{myForm.value | json}}
+</div>
+<div>
+    Form errors : {{myForm.errors | json}}
+</div>
