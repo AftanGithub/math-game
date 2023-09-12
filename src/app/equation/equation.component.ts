@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import {FormGroup,FormControl} from '@angular/forms';
 import { MathValidators } from '../math-validators';
-import { delay, filter } from 'rxjs';
+import { delay, filter, scan } from 'rxjs';
 
 @Component({
   selector: 'app-equation',
@@ -9,6 +9,7 @@ import { delay, filter } from 'rxjs';
   styleUrls: ['./equation.component.css']
 })
 export class EquationComponent {
+  secondsPerSolution = 0;
   myForm = new FormGroup({
     a:new FormControl(this.getRandomNumber()),
     b:new FormControl(this.getRandomNumber()),
@@ -16,7 +17,22 @@ export class EquationComponent {
   },[MathValidators.addition('answer','a','b')]);
 
   ngOnInit(){
-    this.myForm.statusChanges.pipe(filter(value=>value==='VALID'),delay(200)).subscribe((value)=>{
+   
+    this.myForm.statusChanges.pipe(
+      filter(value=>value==='VALID'),
+    delay(200),
+    scan((acc)=>{
+      return {
+        numbersSolved: acc.numbersSolved + 1,
+        startTime:acc.startTime
+      }
+    },{numbersSolved:0,startTime:new Date()})
+    )
+    .subscribe(({numbersSolved,startTime})=>{
+      
+      this.secondsPerSolution = (
+        new Date().getTime() - startTime.getTime()
+      ) / numbersSolved / 1000
      this.myForm.setValue({
       a:this.getRandomNumber(),
       b:this.getRandomNumber(),
